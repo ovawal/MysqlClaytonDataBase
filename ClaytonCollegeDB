@@ -1,0 +1,126 @@
+-- Create the database
+CREATE DATABASE ClaytonCollegeDB;
+
+
+USE ClaytonCollegeDB;
+
+-- Dorms Table
+CREATE TABLE Dorms (
+    DormID INT PRIMARY KEY IDENTITY(1,1), -- Added IDENTITY seed and increment
+    DormName NVARCHAR(100) NOT NULL
+);
+
+-- Create Students table
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    DormID INT NOT NULL,
+    RoomNumber INT NOT NULL,
+    Major VARCHAR(100) NOT NULL,
+    CONSTRAINT FK_Student_Dorm FOREIGN KEY (DormID) REFERENCES Dorms(DormID)
+);
+
+-- Create Classes table
+CREATE TABLE Classes (
+    ClassID INT PRIMARY KEY,
+    ClassName VARCHAR(100) NOT NULL,
+    ClassRoomNumber VARCHAR(10) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL
+);
+
+-- Create Enrollment table
+CREATE TABLE Enrollment (
+    EnrollmentID INT PRIMARY KEY,
+    StudentID INT NOT NULL,
+    ClassID INT NOT NULL,
+    Grade VARCHAR(2),
+    CONSTRAINT FK_Enrollment_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    CONSTRAINT FK_Enrollment_Class FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)
+);
+
+-- Insert Dorms data - Remove explicit DormID since it's IDENTITY
+INSERT INTO Dorms (DormName) VALUES 
+    ('Chapmans Dorm'),
+    ('Artkins Dorm'),
+    ('Maya Dorm');
+
+-- Insert Students data 
+INSERT INTO Students (StudentID, FirstName, LastName, DormID, RoomNumber, Major) 
+VALUES 
+    (1, 'Amelia', 'Aeden', 1, 101, 'Quantum Physics'),
+    (2, 'Sophie', 'Lewis', 1, 101, 'Data Science'),
+    (3, 'Perfeit', 'Thompson', 2, 201, 'Mathematics'),
+    (4, 'Lebron', 'James', 3, 301, 'Operating Systems'),
+    (5, 'Antony', 'Davis', 3, 302, 'Nutrition'),
+    (6, 'Dalton', 'Knecht', 2, 202, 'Finance'),
+    (7, 'Jarred', 'Vanderbiltr', 1, 102, 'Physics'),
+    (8, 'Kobe', 'Bryant', 1, 103, 'Commerce'),
+    (9, 'Kyrie', 'Irving', 2, 203, 'Mechanical Engineering'),
+    (10, 'Steph', 'Curry', 3, 303, 'Business Administration'),
+    (11, 'Draymond', 'Green', 2, 204, 'Economics'),
+    (12, 'Michael', 'Jordan', 1, 104, 'Linguistics'),
+    (13, 'Lamelo', 'Ball', 3, 304, 'Music'),
+    (14, 'Austin', 'Reeves', 2, 205, 'Econometrics'),
+    (15, 'Gabe', 'Vincent', 1, 105, 'Computer Science');
+
+-- Insert Classes data 
+INSERT INTO Classes (ClassID, ClassName, ClassRoomNumber, StartDate, EndDate) 
+VALUES 
+    (1, 'Mathematics 101', 'A1', '2024-09-01', '2025-01-31'),
+    (2, 'Quantum Physics 201', 'B2', '2024-09-01', '2025-01-31'),
+    (3, 'Computer Science 101', 'C1', '2024-09-01', '2025-01-31'),
+    (4, 'Mechanical Engineering 101', 'D2', '2024-09-01', '2025-01-31'),
+    (5, 'Business Administration 201', 'E3', '2024-09-01', '2025-01-31'),
+    (6, 'Data Science 202', 'F4', '2024-09-01', '2025-01-31'),
+    (7, 'Operating Systems 303', 'G5', '2024-09-01', '2025-01-31'),
+    (8, 'Economics 101', 'H6', '2024-09-01', '2025-01-31'),
+    (9, 'Nutrition 101', 'I7', '2024-09-01', '2025-01-31'),
+    (10, 'Finance 102', 'J8', '2024-09-01', '2025-01-31'),
+    (11, 'Music 101', 'K9', '2024-09-01', '2025-01-31'),
+    (12, 'Econometrics 201', 'L10', '2024-09-01', '2025-01-31'),
+    (13, 'Physics 301', 'M11', '2024-09-01', '2025-01-31'),
+    (14, 'Linguistics 101', 'N12', '2024-09-01', '2025-01-31'),
+    (15, 'Commerce 101', 'O13', '2024-09-01', '2025-01-31');
+
+-- Insert Enrollment data
+INSERT INTO Enrollment (EnrollmentID, StudentID, ClassID, Grade) 
+VALUES 
+    (1, 1, 1, 'B+'),
+    (2, 2, 2, 'A'),
+    (3, 3, 3, 'B+'),
+    (4, 4, 4, 'B'),
+    (5, 5, 6, 'A'),
+    (6, 6, 4, 'A-'),
+    (7, 7, 2, 'B+'),
+    (8, 8, 6, 'A'),
+    (9, 9, 7, 'B-'),
+    (10, 10, 5, 'B+'),
+    (11, 11, 8, 'A'),
+    (12, 12, 9, 'C'),
+    (13, 13, 10, 'A'),
+    (14, 14, 7, 'B'),
+    (15, 15, 1, 'A');
+
+-- Create views with GO statements
+
+CREATE VIEW StudentList AS
+SELECT StudentID, FirstName, LastName, Major
+FROM Students;
+
+
+CREATE VIEW ClassListForTwoStudents AS
+SELECT s.FirstName, s.LastName, c.ClassName, e.Grade
+FROM Enrollment e
+JOIN Students s ON e.StudentID = s.StudentID
+JOIN Classes c ON e.ClassID = c.ClassID
+WHERE s.StudentID IN (1, 2);
+
+
+CREATE VIEW StudentsInThreeDorms AS
+SELECT s.FirstName, s.LastName, d.DormName
+FROM Students s
+JOIN Dorms d ON s.DormID = d.DormID
+WHERE d.DormName IN ('Chapmans Dorm', 'Artkins Dorm', 'Maya Dorm');
+
